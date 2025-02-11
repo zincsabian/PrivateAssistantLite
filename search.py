@@ -134,6 +134,6 @@ class WebSearcher:
         return scrape_results
     
 
-    def search_and_scrape(self, query: str, date_restrict: int = 0, target_site: str = "") -> Dict[str, str]:
+    def search(self, query: str, date_restrict: int = 0, target_site: str = "") -> Dict[str, str]:
         search_results = self.search_web(query, date_restrict, target_site)
         return self.scrape_urls(search_results)
