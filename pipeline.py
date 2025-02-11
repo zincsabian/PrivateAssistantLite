@@ -71,10 +71,6 @@ class QAPipeline:
                 template="基于以下资料回答我的问题：{context}\n\n我的问题是: {query}"
             )
             
-            # Log prompt templates
-            self.logger.debug(f"Search prompt template: {self.search_prompt.template}")
-            self.logger.debug(f"QA prompt template: {self.qa_prompt.template}")
-            
             self.vectorstore = None
             self.logger.info("QA Pipeline initialized successfully")
             
@@ -123,7 +119,6 @@ class QAPipeline:
         try:
             # 将文本按行分割
             lines = text.split('\n')
-            self.logger.debug(f"{len(lines)} lines in total")
 
             for line in lines:
                 line = line.strip()
@@ -136,7 +131,6 @@ class QAPipeline:
                 # 检查是否是新的编号部分
                 section_match = re.match(r'^\d+\..*', line)
                 if section_match:
-                    self.logger.debug("matched")
                     if current_chunk:
                         # 如果已有收集的问题，保存当前chunk
                         chunks.append(' '.join(current_chunk))
