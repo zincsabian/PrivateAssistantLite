@@ -63,7 +63,7 @@ class QAPipeline:
             self.logger.debug("Setting up prompt templates")
             self.search_prompt = PromptTemplate(
                 input_variables=["query"],
-                template="对于这个问题: {query}， 如果你可以联网搜索， 你会考虑搜索哪些问题， 请以列表的形式返回你的问题"
+                template="对于这个问题: {query}， 如果你可以联网搜索， 你会考虑搜索哪些问题，不要超过5个问题，请以列表的形式返回你的问题"
             )
             
             self.qa_prompt = PromptTemplate(
@@ -154,6 +154,9 @@ class QAPipeline:
         """Execute searches and process results into vector store"""
         self.logger.info(f"Processing {len(search_queries)} search queries")
         all_texts = []
+
+        if len(search_queries) == 0:
+            return None
         
         try:
             # Search and collect results
@@ -213,7 +216,7 @@ class QAPipeline:
             )
             
             search_queries = self.extract_search_queries(search_response)
-            self.logger.debug(
+            self.logger.info(
                 "Extracted search queries:\n"
                 "----------------------------------------\n" +
                 "\n".join(f"Chunk {i+1}: {chunk}" for i, chunk in enumerate(search_queries)) +
@@ -247,7 +250,7 @@ class QAPipeline:
                 context=context,
                 query=query
             )
-            self.logger.debug(
+            self.logger.info(
                 "Sending QA prompt to model:\n"
                 "----------------------------------------\n"
                 f"{qa_prompt_content}\n"
@@ -271,18 +274,3 @@ class QAPipeline:
             self.logger.error(f"Failed to answer question: {str(e)}")
             raise
 
-
-# Example usage
-if __name__ == "__main__":
-    try:
-        pipeline = QAPipeline(log_level="DEBUG")
-        
-        # Example question
-        question = "什么是向量数据库？它有什么优势？"
-        
-        print("Processing question:", question)
-        answer = pipeline.answer_question(question)
-        print("\nAnswer:", answer)
-        
-    except Exception as e:
-        print(f"An error occurred: {str(e)}")
