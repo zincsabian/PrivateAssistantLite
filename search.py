@@ -3,6 +3,7 @@ import requests
 import urllib.parse
 from bs4 import BeautifulSoup
 import logging
+import json
 from typing import Any, Dict, Generator, List, Optional, Tuple, TypeVar
 
 
@@ -52,29 +53,39 @@ class WebSearcher:
 
         self.logger.debug(f"Searching for query: {query}")
 
-        response = requests.get(url)
-        if not response:
+        resp = requests.get(url)
+
+        if resp is None:
             raise Exception("No response from search API")
 
-        search_results = response.json()
-        if "error" in search_results:
-            raise Exception(search_results["error"])
+        search_results_dict = json.loads(resp.text)
+        if "error" in search_results_dict:
+            raise Exception(
+                f"Error in search API response: {search_results_dict['error']}"
+            )
 
-        total_results = search_results["searchInformation"].get("totalResults", 0)
+        if "searchInformation" not in search_results_dict:
+            raise Exception(
+                f"No search information in search API response: {resp.text}"
+            )
+
+        total_results = search_results_dict["searchInformation"].get("totalResults", 0)
         if total_results == 0:
             self.logger.warning(f"No results found for query: {query}")
             return []
 
-        results = search_results.get("items", [])
-        if not results:
+        results = search_results_dict.get("items", [])
+        if results is None or len(results) == 0:
             self.logger.warning(f"No result items in the response for query: {query}")
             return []
 
         found_links = []
         for result in results:
-            link = result.get("link", "")
-            if link:
-                found_links.append(link)
+            link = result.get("link", None)
+            if link is None or link == "":
+                self.logger.warning(f"Search result link missing: {result}")
+                continue
+            found_links.append(link)
         return found_links
 
     def scrape_url_content(self, url: str) -> Optional[str]:
