@@ -5,13 +5,16 @@ from bs4 import BeautifulSoup
 import logging
 from typing import Any, Dict, Generator, List, Optional, Tuple, TypeVar
 
+
 class WebSearcher:
     def __init__(self):
-        self.logger = self._get_logger('INFO')
+        self.logger = self._get_logger("INFO")
         self.session = requests.Session()
-        self.session.headers.update({
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0"
-        })
+        self.session.headers.update(
+            {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36 Edg/119.0.0.0"
+            }
+        )
 
         self.search_api_url = os.environ.get("SEARCH_API_URL")
         self.search_api_key = os.environ.get("SEARCH_API_KEY")
@@ -21,9 +24,9 @@ class WebSearcher:
         if not self.search_api_url:
             self.search_api_url = "https://www.googleapis.com/customsearch/v1"
         if not self.search_api_key:
-            self.search_api_key = "dummy-search-api-key"
+            raise Exception("SEARCH_API_KEY is needed")
         if not self.search_project_id:
-            self.search_project_id = "dummy-search-project-id"
+            raise Exception("SEARCH_PROJECT_KEY is needed")
 
     @staticmethod
     def _get_logger(log_level: str) -> logging.Logger:
@@ -35,7 +38,9 @@ class WebSearcher:
         logger.addHandler(handler)
         return logger
 
-    def search_web(self, query: str, date_restrict: int = 0, target_site: str = "") -> List[str]:
+    def search_web(
+        self, query: str, date_restrict: int = 0, target_site: str = ""
+    ) -> List[str]:
         escaped_query = urllib.parse.quote(query)
         url_base = f"{self.search_api_url}?key={self.search_api_key}&cx={self.search_project_id}&q={escaped_query}"
         url_paras = f"&safe=active"
@@ -81,15 +86,21 @@ class WebSearcher:
             if body_tag:
                 body_text = " ".join(body_tag.get_text().split()).strip()
                 if len(body_text) > 100:
-                    self.logger.info(f"Successfully scraped {url} with length: {len(body_text)}")
+                    self.logger.info(
+                        f"Successfully scraped {url} with length: {len(body_text)}"
+                    )
                     return body_text
                 else:
-                    self.logger.warning(f"Body text too short for URL: {url}, length: {len(body_text)}")
+                    self.logger.warning(
+                        f"Body text too short for URL: {url}, length: {len(body_text)}"
+                    )
         except Exception as e:
             self.logger.error(f"Failed to scrape {url}: {e}")
         return None
 
-    def search_and_scrape(self, query: str, date_restrict: int = 0, target_site: str = "") -> Dict[str, str]:
+    def search_and_scrape(
+        self, query: str, date_restrict: int = 0, target_site: str = ""
+    ) -> Dict[str, str]:
         search_results = self.search_web(query, date_restrict, target_site)
         scraped_content = {}
         for url in search_results:
