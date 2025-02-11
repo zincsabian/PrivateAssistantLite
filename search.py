@@ -5,6 +5,8 @@ from bs4 import BeautifulSoup
 import logging
 import json
 from typing import Any, Dict, Generator, List, Optional, Tuple, TypeVar
+from functools import partial
+from concurrent.futures import ThreadPoolExecutor
 
 
 class WebSearcher:
@@ -88,34 +90,50 @@ class WebSearcher:
             found_links.append(link)
         return found_links
 
-    def scrape_url_content(self, url: str) -> Optional[str]:
+    def _scape_url(self, url: str) -> Tuple[str, str]:
         self.logger.info(f"Scraping {url} ...")
         try:
             response = self.session.get(url, timeout=10)
             soup = BeautifulSoup(response.content, "lxml", from_encoding="utf-8")
+
             body_tag = soup.body
             if body_tag:
-                body_text = " ".join(body_tag.get_text().split()).strip()
+                body_text = body_tag.get_text()
+                body_text = " ".join(body_text.split()).strip()
+                self.logger.debug(f"Scraped {url}: {body_text}...")
                 if len(body_text) > 100:
                     self.logger.info(
-                        f"Successfully scraped {url} with length: {len(body_text)}"
+                        f"✅ Successfully scraped {url} with length: {len(body_text)}"
                     )
-                    return body_text
+                    return url, body_text
                 else:
                     self.logger.warning(
-                        f"Body text too short for URL: {url}, length: {len(body_text)}"
+                        f"Body text too short for url: {url}, length: {len(body_text)}"
                     )
+                    return url, ""
+            else:
+                self.logger.warning(f"No body tag found in the response for url: {url}")
+                return url, ""
         except Exception as e:
-            self.logger.error(f"Failed to scrape {url}: {e}")
-        return None
+            self.logger.error(f"Scraping error {url}: {e}")
+            return url, ""
 
-    def search_and_scrape(
-        self, query: str, date_restrict: int = 0, target_site: str = ""
-    ) -> Dict[str, str]:
+
+    def scrape_urls(self, urls: List[str]) -> Dict[str, str]:
+        # the key is the url and the value is the body text
+        scrape_results: Dict[str, str] = {}
+
+        partial_scrape = partial(self._scape_url)
+        with ThreadPoolExecutor(max_workers=10) as executor:
+            results = executor.map(partial_scrape, urls)
+
+        for url, body_text in results:
+            if body_text != "":
+                scrape_results[url] = body_text
+
+        return scrape_results
+    
+
+    def search_and_scrape(self, query: str, date_restrict: int = 0, target_site: str = "") -> Dict[str, str]:
         search_results = self.search_web(query, date_restrict, target_site)
-        scraped_content = {}
-        for url in search_results:
-            content = self.scrape_url_content(url)
-            if content:
-                scraped_content[url] = content
-        return scraped_content
+        return self.scrape_urls(search_results)
