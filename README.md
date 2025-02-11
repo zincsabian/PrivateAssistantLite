@@ -9,7 +9,11 @@ NOTE that this project is for learning.
 ### quick-start
 
 1. python environment
+   It's recommended to use virtual env.
+
    ``` shell
+    pip install conda
+
     conda create --name test python=3.10
     conda activate test
 
@@ -17,8 +21,8 @@ NOTE that this project is for learning.
    ```
 2. env config
    ```
-    SEARCH_API_KEY=
-    SEARCH_PROJECT_KEY=
+    SEARCH_API_KEY=<your_api_key>
+    SEARCH_PROJECT_KEY=<your_cx>
     SEARCH_API_URL=https://www.googleapis.com/customsearch/v1
    ```
 
