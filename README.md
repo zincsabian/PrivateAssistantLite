@@ -5,9 +5,14 @@ Note that this project is for learning purposes, and it involves using an LLM-Ag
 ### introduction
 
 This is a project focused on LLM-Agent. 
+
 I am building a RAG workflow that will help us learn about web security.
 
-I’m currently running the DeepSeek-R1: 7B model locally using Ollama. This model is distilled from QWen 2.5. You can replace it with any suitable large model by simply modifying the ``self.llm`` part in ``pipeline.py``.
+I’m currently running the DeepSeek-R1: 7B model locally using Ollama. 
+
+This model is distilled from QWen 2.5. 
+
+You can replace it with any suitable large model by simply modifying the ``self.llm`` part in ``pipeline.py``.
 
 ### TODO
 
@@ -18,8 +23,11 @@ I’m currently running the DeepSeek-R1: 7B model locally using Ollama. This mod
 ### How to Customize your LLM-Agent.
 
 Configure your Google Custom Search API, and set up domain restrictions within it. 
+
 Note that you should follow the rules from Google Custom Search API.
+
 For example, if you’re building an expert system for cybersecurity, these websites are all you need
+
 Maybe there are some limits, you can choose what you need to configue.
 
 ``` text
@@ -64,7 +72,7 @@ Maybe there are some limits, you can choose what you need to configue.
 
 [google custom search](https://developers.google.com/custom-search/v1/overview?hl=zh-cn)
 
-3. run it
+3. 
    ``` shell
     python demo.py
    ```
