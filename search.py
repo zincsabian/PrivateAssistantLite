@@ -44,8 +44,6 @@ class WebSearcher:
     def search_web(
         self, query: str, date_restrict: int = 0, target_site: str = ""
     ) -> List[str]:
-        
-        return None
 
         escaped_query = urllib.parse.quote(query)
         url_base = f"{self.search_api_url}?key={self.search_api_key}&cx={self.search_project_id}&q={escaped_query}"
@@ -94,7 +92,7 @@ class WebSearcher:
         return found_links
 
     def _scape_url(self, url: str) -> Tuple[str, str]:
-        self.logger.info(f"Scraping {url} ...")
+        self.logger.debug(f"Scraping {url} ...")
         try:
             response = self.session.get(url, timeout=10)
             soup = BeautifulSoup(response.content, "lxml", from_encoding="utf-8")
@@ -105,7 +103,7 @@ class WebSearcher:
                 body_text = " ".join(body_text.split()).strip()
                 self.logger.debug(f"Scraped {url}: {body_text}...")
                 if len(body_text) > 100:
-                    self.logger.info(
+                    self.logger.debug(
                         f"✅ Successfully scraped {url} with length: {len(body_text)}"
                     )
                     return url, body_text

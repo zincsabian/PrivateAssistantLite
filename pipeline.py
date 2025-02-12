@@ -75,8 +75,9 @@ class QAPipeline:
             # Initialize text splitter
             self.logger.info("Initializing text splitter")
             self.text_splitter = TokenTextSplitter(
-                chunk_size=800,
-                chunk_overlap=150
+                chunk_size=1000,
+                chunk_overlap=150,
+                disallowed_special=()  # 禁用所有特殊标记检查
             )
             
             # Initialize prompt templates
@@ -84,13 +85,11 @@ class QAPipeline:
             self.search_prompt = PromptTemplate(
                 input_variables=["query", "time", "history"],
                 template="""你是一个剑桥大学网络空间安全领域的专家,
-当前的时间是: "{time}" \n
-之前的对话历史: "{history}" \n
-我的问题是: "{query}" \n
-考虑上述对话历史以及我的问题，你可以向搜索引擎提出一些问题来补充所需信息，请这样返回你的疑问:
-1. 问题1
-2. 问题2
-......
+当前的时间是: "{time}",
+之前的对话历史: "{history}",
+我的问题是: "{query}",
+考虑上述对话历史以及我的问题，你可以向搜索引擎提出一些问题来补充所需信息，请以列表的形式返回你的疑问。
+如果历史对话中已经包含足够信息，你可以返回空列表。
 """
             )
             
@@ -181,7 +180,7 @@ class QAPipeline:
             if current_chunk:
                 chunks.append(' '.join(current_chunk))
             
-            self.logger.info(f"Extracted questions from LLM: {chunks}")
+            self.logger.debug(f"Extracted questions from LLM: {chunks}")
             return chunks
             
         except Exception as e:
@@ -206,15 +205,14 @@ class QAPipeline:
                     "----------------------------------------"
                 )
 
-                if results:
-                    for url, content in results.items():
-                        self.logger.debug(f"URL: {url}")
-                        self.logger.debug(f"Content preview: {content[:500]}...\n")
-                    
-                    for url, content in results.items():
-                        chunks = self.text_splitter.split_text(content)
-                        chunks = [f"Source: {url}\n\n{chunk}" for chunk in chunks]
-                        all_texts.extend(chunks)
+                for url, content in results.items():
+                    self.logger.debug(f"URL: {url}")
+                    self.logger.debug(f"Content preview: {content[:500]}...\n")
+                
+                for url, content in results.items():
+                    chunks = self.text_splitter.split_text(content)
+                    chunks = [f"Source: {url}\n\n{chunk}" for chunk in chunks]
+                    all_texts.extend(chunks)
             
             # Create or update vector store
             self.logger.debug(f"Adding {len(all_texts)} text chunks to vector store")
@@ -310,7 +308,7 @@ class QAPipeline:
 
 if __name__ == '__main__':
     # 初始化pipeline
-    pipeline = QAPipeline(log_level="DEBUG", history_limit=5)
+    pipeline = QAPipeline(log_level="INFO", history_limit=5)
 
     # 第一轮对话
     answer1 = pipeline.answer_question("什么是SQL注入攻击？")
