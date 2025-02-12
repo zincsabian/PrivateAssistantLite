@@ -1,8 +1,8 @@
-## simple spider
+# PrivateAssistantLite
 
 Note that this project is for learning purposes, and it involves using an LLM-Agent.
 
-### introduction
+## introduction
 
 This is a project focused on LLM-Agent. 
 
@@ -14,13 +14,13 @@ This model is distilled from QWen 2.5.
 
 You can replace it with any suitable large model by simply modifying the ``self.llm`` part in ``pipeline.py``.
 
-### TODO
+## TODO
 
 1. Instead of conducting a full web search using Google, searching on a few specific professional websites.
 2. Configure a local knowledge base to accelerate the model’s loading speed. (Maybe follow ``ask.py`` to use DuckDB)
 3. Use Streamlit to create a visual front-end interface.
 
-### How to Customize your LLM-Agent.
+## How to Customize your LLM-Agent.
 
 Configure your Google Custom Search API, and set up domain restrictions within it. 
 
@@ -43,13 +43,13 @@ Maybe there are some limits, you can choose what you need to configue.
    cdsn.net
 ```
 
-### reference
+## reference
 
 1. [pengfeng/ask.py](https://github.com/pengfeng/ask.py?tab=readme-ov-file)
-2. [阿里云社区开发者课程](https://developer.aliyun.com/article/1266585)
+2. [Alicloud Developer class](https://developer.aliyun.com/article/1266585)
 3. [deepseek api status](https://status.deepseek.com/#)
 
-### quick-start
+## quick-start
 
 1. python environment
 
