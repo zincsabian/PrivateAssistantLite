@@ -60,7 +60,8 @@ Maybe there are some limits, you can choose what you need to configue.
     conda create --name test python=3.10
     conda activate test
 
-   ## If you plan to use your local environment directly, please disregard the previous instructions.
+   ## If you plan to use your local environment directly, 
+   ## please disregard the previous instructions.
     pip install -r requirements.txt
    ```
 2. env config

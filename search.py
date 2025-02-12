@@ -119,7 +119,6 @@ class WebSearcher:
             self.logger.error(f"Scraping error {url}: {e}")
             return url, ""
 
-
     def scrape_urls(self, urls: List[str]) -> Dict[str, str]:
         # the key is the url and the value is the body text
         scrape_results: Dict[str, str] = {}
@@ -133,8 +132,9 @@ class WebSearcher:
                 scrape_results[url] = body_text
 
         return scrape_results
-    
 
-    def search(self, query: str, date_restrict: int = 0, target_site: str = "") -> Dict[str, str]:
+    def search(
+        self, query: str, date_restrict: int = 0, target_site: str = ""
+    ) -> Dict[str, str]:
         search_results = self.search_web(query, date_restrict, target_site)
         return self.scrape_urls(search_results)

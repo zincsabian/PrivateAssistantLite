@@ -28,7 +28,7 @@ if __name__ == "__main__":
 
 这些问题将帮助你深入了解 SQL 注入攻击的本质、影响以及防范方法。
 """
-    
+
     pipeline = QAPipeline(log_level="INFO")
     queries = pipeline.extract_search_queries(test_text)
     print("\nExtracted question chunks:")
