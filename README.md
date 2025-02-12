@@ -14,6 +14,8 @@ This model is distilled from QWen 2.5.
 
 You can replace it with any suitable large model by simply modifying the ``self.llm`` part in ``pipeline.py``.
 
+It’s important to note that the context length of the model is crucial during multi-turn conversations.
+
 ## TODO
 
 1. Instead of conducting a full web search using Google, searching on a few specific professional websites.
