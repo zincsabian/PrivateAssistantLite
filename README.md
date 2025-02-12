@@ -2,15 +2,17 @@
 
 Note that this project is for learning purposes, and it involves using an LLM-Agent.
 
+It's encouraged that you star the repository and open issues.
+
 ## introduction
 
 This is a project focused on LLM-Agent. 
 
 I am building a RAG workflow that will help us learn about web security.
 
-I’m currently running the DeepSeek-R1: 7B model locally using Ollama. 
+I’m currently running the DeepSeek-R1: 7B model, which is distilled from QWen 2.5 locally using Ollama. 
 
-This model is distilled from QWen 2.5. 
+Local Machine Configuration: MacBook Pro (M1 Pro) 16gb, please select an appropriate model based on your local machine configuration.
 
 You can replace it with any suitable large model by simply modifying the ``self.llm`` part in ``pipeline.py``.
 
