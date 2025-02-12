@@ -24,7 +24,7 @@ It’s important to note that the context length of the model is crucial during 
 
 ## How to Customize your LLM-Agent.
 
-Configure your Google Custom Search API, and set up domain restrictions within it. 
+Configure your [Google Custom Search API](https://developers.google.com/custom-search/v1/overview?hl=zh-cn), and set up domain restrictions within it. 
 
 Note that you should follow the rules from Google Custom Search API.
 
