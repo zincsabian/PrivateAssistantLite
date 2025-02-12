@@ -1,20 +1,23 @@
 import os
-from dotenv import load_dotenv
 from datetime import datetime
+from langchain_ollama import OllamaLLM  # 使用新的 OllamaLLM 类
 
-from langchain_openai.chat_models.base import BaseChatOpenAI
-
-
-load_dotenv()
-llm = BaseChatOpenAI(
-    model='deepseek-chat', 
-    openai_api_key=os.getenv('DEEPSEEK_API_KEY'), 
-    openai_api_base='https://api.deepseek.com',
-    max_tokens=8192
+# Initialize Ollama with local deepseek-r1:7b model
+llm = OllamaLLM(
+    model="deepseek-r1:7b",  # 本地模型名称
+    ollama_base_url="http://localhost:11434"  # Ollama 的本地监听地址
 )
 
-query = input("Please input your question: ")
-prompt = f"你是一个麻省理工学院统计与数据分析的教授\n， 当前的时间是: {datetime.now()}\n, 对于这个问题: \"{query}\"， 你可以向搜索引擎提出一些问题，请以列表的形式返回你的疑问。"
+prompt = f"""你是一个剑桥大学网络空间安全领域的专家,
+当前的时间是: "{datetime.now()}",
+
+之前的对话历史: "",
+
+我的问题是: "什么是SQL注入攻击",
+
+考虑上述对话历史以及我的问题，你可以向搜索引擎提出一些问题来补充所需信息，请以列表的形式返回你的疑问。
+如果历史对话中已经包含足够信息，你可以返回空列表。"""
+
 print(f"Your prompt is: {prompt}")
 response = llm.invoke(prompt)
-print(response.content)
+print(response)

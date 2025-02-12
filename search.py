@@ -44,6 +44,9 @@ class WebSearcher:
     def search_web(
         self, query: str, date_restrict: int = 0, target_site: str = ""
     ) -> List[str]:
+        
+        return None
+
         escaped_query = urllib.parse.quote(query)
         url_base = f"{self.search_api_url}?key={self.search_api_key}&cx={self.search_project_id}&q={escaped_query}"
         url_paras = f"&safe=active"
