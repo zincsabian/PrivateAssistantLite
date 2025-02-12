@@ -89,19 +89,16 @@ class QAPipeline:
 之前的对话历史: "{history}",
 我的问题是: "{query}",
 考虑上述对话历史以及我的问题，你可以向搜索引擎提出一些问题来补充所需信息，请以列表的形式返回你的疑问。
-如果历史对话中已经包含足够信息，你可以返回空列表。
 """
             )
             
             self.qa_prompt = PromptTemplate(
-                input_variables=["current_context", "query", "time", "history", "history_contexts"],
+                input_variables=["current_context", "query", "time", "history"],
                 template="""你是一个剑桥大学网络空间安全领域的专家
 
 当前的时间是: "{time}"
 
 之前的对话历史: "{history}"
-
-之前对话中使用的相关资料: "{history_contexts}"
 
 当前问题的相关资料: "{current_context}"
 
@@ -225,30 +222,30 @@ class QAPipeline:
             self.logger.error(f"Failed in search and process step: {str(e)}")
             raise
 
-    def _format_history(self, max_tokens: int = 2000) -> Tuple[str, str]:
+    def _format_history(self, max_tokens: int = 2000) -> str:
         """格式化对话历史和相关上下文"""
         formatted_history = []
-        history_contexts = []
+        # history_contexts = []
         
         for msg in self.history[-self.history_limit:]:
             if msg.role == "user":
                 formatted_history.append(f"Human: {msg.content}")
             else:
                 formatted_history.append(f"Assistant: {msg.content}")
-                if msg.context:
-                    history_contexts.append(msg.context)
+                # if msg.context:
+                #     history_contexts.append(msg.context)
         
         # 使用text splitter确保不超出token限制
         text_splitter = TokenTextSplitter(chunk_size=max_tokens, chunk_overlap=0)
         history_text = "\n".join(formatted_history)
-        contexts_text = "\n---\n".join(history_contexts)
+        # contexts_text = "\n---\n".join(history_contexts)
         
         if len(history_text) > 0:
             history_text = text_splitter.split_text(history_text)[0]
-        if len(contexts_text) > 0:
-            contexts_text = text_splitter.split_text(contexts_text)[0]
+        # if len(contexts_text) > 0:
+        #     contexts_text = text_splitter.split_text(contexts_text)[0]
             
-        return history_text, contexts_text
+        return history_text
 
     def answer_question(self, query: str) -> str:
         """Enhanced answer_question method with chat history support"""
@@ -256,10 +253,10 @@ class QAPipeline:
         
         try:
             # 获取格式化的历史对话
-            history_text, history_contexts = self._format_history()
+            history_text = self._format_history()
             
             self.logger.debug(f"history text: {history_text}")
-            self.logger.debug(f"history_contexts: {history_contexts}")
+            # self.logger.debug(f"history_contexts: {history_contexts}")
 
             # 生成搜索查询
             self.logger.info("=== Search Phase ===")
@@ -279,8 +276,10 @@ class QAPipeline:
             if self.vectorstore is None:
                 current_context = "No information available."
             else:
-                relevant_docs = self.vectorstore.similarity_search(query, k=10)
+                relevant_docs = self.vectorstore.similarity_search(query, k=5)
                 current_context = "\n\n".join([doc.page_content for doc in relevant_docs])
+
+            self.logger.info(current_context)
             
             # 生成最终答案
             chain = self.qa_prompt | self.llm | StrOutputParser()
@@ -289,7 +288,7 @@ class QAPipeline:
                 "query": query,
                 "time": datetime.now(),
                 "history": history_text,
-                "history_contexts": history_contexts
+                # "history_contexts": history_contexts
             })
             
             # 更新对话历史
