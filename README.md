@@ -4,7 +4,8 @@ NOTE that this project is for learning.
 
 ### reference
 
-1. [ask.py](https://github.com/pengfeng/ask.py?tab=readme-ov-file)
+1. [pengfeng/ask.py](https://github.com/pengfeng/ask.py?tab=readme-ov-file)
+2. [阿里云社区开发者课程](https://developer.aliyun.com/article/1266585)
 
 ### quick-start
 

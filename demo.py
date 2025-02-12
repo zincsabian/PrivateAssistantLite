@@ -3,10 +3,9 @@ from pipeline import QAPipeline
 
 if __name__ == "__main__":
     try:
-        pipeline = QAPipeline(log_level="WARNING")
+        pipeline = QAPipeline(log_level="DEBUG")
         
-        # Example question
-        question = "SQL注入漏洞是什么含义，有哪些攻击手段，什么时候发现的，影响面有多大。"
+        question = input("Please input your question: ")
         
         print("Processing question:", question)
         answer = pipeline.answer_question(question)

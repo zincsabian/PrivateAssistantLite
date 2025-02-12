@@ -4,6 +4,7 @@ import os
 import torch
 import json
 import re
+from datetime import datetime
 from dotenv import load_dotenv
 from search import WebSearcher
 from langchain_core.prompts import PromptTemplate
@@ -20,23 +21,22 @@ class QAPipeline:
         
         try:
             load_dotenv()
-            self.logger.debug("Loaded environment variables")
+            self.logger.info("Loaded environment variables")
             
             # Initialize LLM
-            self.logger.debug("Initializing LLM")
+            self.logger.info("Initializing LLM")
             self.llm = BaseChatOpenAI(
                 model='deepseek-chat',
                 openai_api_key=os.getenv('DEEPSEEK_API_KEY'),
                 openai_api_base='https://api.deepseek.com',
-                max_tokens=1024
+                max_tokens=8192
             )
             
             # Initialize web searcher
-            self.logger.debug("Initializing web searcher")
+            self.logger.info("Initializing web searcher")
             self.searcher = WebSearcher()
             
             # Initialize embeddings model
-            self.logger.debug("Initializing embeddings model")
             if torch.backends.mps.is_available():
                 device = 'mps'
             elif torch.cuda.is_available():
@@ -44,7 +44,8 @@ class QAPipeline:
             else:
                 device = 'cpu'
             
-            self.logger.info(f"Using device: {device}")
+            self.logger.info(f"Using {device} to inference")
+            self.logger.info("Initializing embeddings model")
             
             self.embeddings = HuggingFaceEmbeddings(
                 model_name="moka-ai/m3e-base",
@@ -53,22 +54,22 @@ class QAPipeline:
             )
             
             # Initialize text splitter
-            self.logger.debug("Initializing text splitter")
+            self.logger.info("Initializing text splitter")
             self.text_splitter = TokenTextSplitter(
-                chunk_size=500,
-                chunk_overlap=50
+                chunk_size=1000,
+                chunk_overlap=100
             )
             
             # Initialize prompt templates
-            self.logger.debug("Setting up prompt templates")
+            self.logger.info("Setting up prompt templates")
             self.search_prompt = PromptTemplate(
-                input_variables=["query"],
-                template="对于这个问题: {query}， 如果你可以联网搜索， 你会考虑搜索哪些问题，不要超过5个问题，请以列表的形式返回你的问题"
+                input_variables=["query", "time"],
+                template="你是一个剑桥大学网络空间安全领域的专家,\n 当前的时间是: {time},\n 对于这个问题: \"{query}\"， 你可以向搜索引擎提出一些问题，请以列表的形式返回你的疑问。"
             )
             
             self.qa_prompt = PromptTemplate(
-                input_variables=["context", "query"],
-                template="基于以下资料回答我的问题：{context}\n\n我的问题是: {query}"
+                input_variables=["context", "query", "time"],
+                template="你是一个剑桥大学网络空间安全领域的专家\n\n， 当前的时间是: {time},\n 请你基于以下资料回答我的问题： \"{context}\"\n\n 我的问题是: \"{query}\"\n"
             )
             
             self.vectorstore = None
@@ -128,22 +129,19 @@ class QAPipeline:
                 question = re.sub(r'^\s*-\s*', '', line)
                 question = re.sub(r'\*\*', '', question)
 
-                # 检查是否是新的编号部分
                 section_match = re.match(r'^\d+\..*', line)
                 if section_match:
                     if current_chunk:
-                        # 如果已有收集的问题，保存当前chunk
                         chunks.append(' '.join(current_chunk))
                         current_chunk = []
                     current_chunk.append(question)
                 elif current_chunk:
                     current_chunk.append(question)
-            
-            # 添加最后一个chunk
+
             if current_chunk:
                 chunks.append(' '.join(current_chunk))
             
-            self.logger.debug(f"Extracted question chunks: {chunks}")
+            self.logger.info(f"Extracted questions from LLM: {chunks}")
             return chunks
             
         except Exception as e:
@@ -196,7 +194,8 @@ class QAPipeline:
             self.logger.info("=== Search Phase ===")
             search_prompt_content = self.format_prompt_for_log(
                 self.search_prompt, 
-                query=query
+                query=query,
+                time=datetime.now(),
             )
             self.logger.debug(
                 "Sending search prompt to model:\n"
@@ -206,7 +205,7 @@ class QAPipeline:
             )
             
             chain = self.search_prompt | self.llm | StrOutputParser()
-            search_response = chain.invoke({"query": query})
+            search_response = chain.invoke({"query": query, "time": datetime.now()})
             
             self.logger.debug(
                 "Received search response from model:\n"
@@ -248,7 +247,8 @@ class QAPipeline:
             qa_prompt_content = self.format_prompt_for_log(
                 self.qa_prompt,
                 context=context,
-                query=query
+                query=query,
+                time=datetime.now(),
             )
             self.logger.info(
                 "Sending QA prompt to model:\n"
@@ -258,7 +258,7 @@ class QAPipeline:
             )
             
             chain = self.qa_prompt | self.llm | StrOutputParser()
-            answer = chain.invoke({"context": context, "query": query})
+            answer = chain.invoke({"context": context, "query": query, "time": datetime.now()})
             
             self.logger.debug(
                 "Received final answer from model:\n"
