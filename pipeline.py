@@ -48,7 +48,8 @@ class QAPipeline:
             # )
             self.llm = OllamaLLM(
                 model="deepseek-r1:7b",  # 本地模型名称
-                ollama_base_url="http://localhost:11434"  # Ollama 的本地监听地址
+                ollama_base_url="http://localhost:11434",  # Ollama 的本地监听地址
+                num_ctx=8192
             )
             
             # Initialize web searcher

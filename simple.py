@@ -6,7 +6,7 @@ from langchain_ollama import OllamaLLM  # 使用新的 OllamaLLM 类
 llm = OllamaLLM(
     model="deepseek-r1:7b",  # 本地模型名称
     ollama_base_url="http://localhost:11434",  # Ollama 的本地监听地址
-    num_ctx=2**14
+    num_ctx=8192
 )
 
 prompt = f"""你是一个剑桥大学网络空间安全领域的专家,
