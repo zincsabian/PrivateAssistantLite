@@ -1,10 +1,12 @@
 # PrivateAssistantLite
 
+This is a simple private assistant that is easy to customize.
+
 Note that this project is for learning purposes, and it involves using an LLM-Agent.
 
 It's encouraged that you star the repository and open issues.
 
-## introduction
+## Introduction
 
 This is a project focused on LLM-Agent. 
 
