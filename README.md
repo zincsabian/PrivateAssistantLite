@@ -2,6 +2,9 @@
 
 This is a simple private assistant that is easy to customize.
 
+This is my Diploma Thesis in the Network Space Security College at Hangzhou Dianzi 
+University.
+
 Note that this project is for learning purposes, and it involves using an LLM-Agent.
 
 It's encouraged that you star the repository and open issues.
