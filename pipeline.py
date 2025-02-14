@@ -91,7 +91,9 @@ class QAPipeline:
 当前的时间是: "{time}",
 之前的对话历史: "{history}",
 我的问题是: "{query}",
-考虑上述对话历史以及我的问题，你可以向搜索引擎提出一些问题来补充所需信息，请以列表的形式返回你的疑问。
+考虑上述对话历史以及我的问题，你可以向搜索引擎提出一些问题来补充所需信息，请以以下形式返回你的疑问。
+1. 问题1
+2. 问题2
 """,
             )
 
@@ -316,14 +318,14 @@ class QAPipeline:
 
 if __name__ == "__main__":
     # 初始化pipeline
-    pipeline = QAPipeline(log_level="INFO", history_limit=5)
+    pipeline = QAPipeline(log_level="WARN", history_limit=5)
 
     # 第一轮对话
-    answer1 = pipeline.answer_question("什么是SQL注入攻击？")
+    answer1 = pipeline.answer_question("近期比较严重的一次大规模网络攻击")
 
     print(answer1)
 
     # 第二轮对话
-    answer2 = pipeline.answer_question("如何预防这种攻击？")
+    answer2 = pipeline.answer_question("这次网络事故是由什么造成的")
 
     print(answer2)

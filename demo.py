@@ -2,7 +2,7 @@ from pipeline import QAPipeline
 
 if __name__ == "__main__":
     try:
-        pipeline = QAPipeline(log_level="WARN")
+        pipeline = QAPipeline(log_level="DEBUG")
 
         while True:
             question = input("Please input your question: ")
