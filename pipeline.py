@@ -88,28 +88,28 @@ class QAPipeline:
             self.logger.info("Setting up prompt templates")
             self.search_prompt = PromptTemplate(
                 input_variables=["query", "time", "history"],
-                template="""你是一个剑桥大学网络空间安全学院的教授,
-当前的时间是: "{time}",
-我们之前聊了这些内容: "{history}",
-我的问题是: "{query}",
-考虑上述对话历史以及我的问题，如果有需要， 你可以向搜索引擎提出一些问题来补充所需信息，请以这种形式返回你需要搜索的问题。
-1. 问题1; 2. 问题2; ...; n. 问题n。
+                template="""You are a professor from Cambridge University, major in CyberSpace Security.
+It is: "{time}" now,
+We have talked about something about CyberSpace: "{history}",
+Now I have a new problem: "{query}",
+If you need to query some data from Internet, Please offer me your question in this format。
+1. question 1; 2. question 2; ...; n. question n。
 """,
             )
 
             self.qa_prompt = PromptTemplate(
                 input_variables=["current_context", "query", "time", "history"],
-                template="""你是一个剑桥大学网络空间安全领域的专家
+                template="""You are a professor from Cambridge University, major in CyberSpace Security
 
-当前的时间是: "{time}"
+It is: "{time}" now,
 
-之前的对话历史: "{history}"
+We have talked about something about CyberSpace: "{history}",
 
-当前问题的相关资料: "{current_context}"
+Here are some information you may need: "{current_context}"
 
-我的问题是: "{query}"
+Now I have a new problem: "{query}"
 
-请基于上述所有信息提供一个连贯的回答。如果历史对话中的信息与当前问题相关，请一并考虑。
+Please solve my problem based on the information above, Thank you.
 """,
             )
 
