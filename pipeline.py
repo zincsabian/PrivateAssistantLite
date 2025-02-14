@@ -48,6 +48,7 @@ class QAPipeline:
             #     openai_api_base='https://api.deepseek.com',
             #     max_tokens=8192
             # )
+
             self.llm = OllamaLLM(
                 model="deepseek-r1:7b",  # 本地模型名称
                 ollama_base_url="http://localhost:11434",  # Ollama 的本地监听地址
@@ -87,13 +88,12 @@ class QAPipeline:
             self.logger.info("Setting up prompt templates")
             self.search_prompt = PromptTemplate(
                 input_variables=["query", "time", "history"],
-                template="""你是一个剑桥大学网络空间安全领域的专家,
+                template="""你是一个剑桥大学网络空间安全学院的教授,
 当前的时间是: "{time}",
-之前的对话历史: "{history}",
+我们之前聊了这些内容: "{history}",
 我的问题是: "{query}",
-考虑上述对话历史以及我的问题，你可以向搜索引擎提出一些问题来补充所需信息，请以以下形式返回你的疑问。
-1. 问题1
-2. 问题2
+考虑上述对话历史以及我的问题，如果有需要， 你可以向搜索引擎提出一些问题来补充所需信息，请以这种形式返回你需要搜索的问题。
+1. 问题1; 2. 问题2; ...; n. 问题n。
 """,
             )
 
@@ -226,7 +226,6 @@ class QAPipeline:
 
         except Exception as e:
             self.logger.error(f"Failed in search and process step: {str(e)}")
-            raise
 
     def _format_history(self, max_tokens: int = 2000) -> str:
         """格式化对话历史和相关上下文"""
